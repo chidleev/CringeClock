@@ -1,0 +1,20 @@
+{
+  "name": "CringeClock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "Chidleev",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "three": "^0.134.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  }
+}
