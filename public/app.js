@@ -4,6 +4,8 @@ import {FlakesTexture} from 'FlakesTexture'
 
 const elementSize = 10
 const pi = 3.14159265359
+const zoom = 0.2
+
 const scene = new THREE.Scene()
 const elementStatus = [
     [0, 0, 0, 0, 0, 0, 1], //0
@@ -27,11 +29,12 @@ renderer.setClearColor(0x204040)
 document.body.appendChild(renderer.domElement)
 
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+//const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+const camera = new THREE.OrthographicCamera(-window.innerWidth * zoom, window.innerWidth * zoom, window.innerHeight * zoom, -window.innerHeight * zoom, 0.0001, 10000);
 camera.position.set(0, 0, 200)
 
-const controls = new OrbitControls(camera, document.body)
-controls.enableDamping = true
+/*const controls = new OrbitControls(camera, document.body)
+controls.enableDamping = true*/
 
 
 const ambient = new THREE.AmbientLight(0x204040, 1)
@@ -65,7 +68,7 @@ function Element() {
         this.geometry, 
         [
             new THREE.MeshPhongMaterial({color: 0xffffff}),
-            new THREE.MeshPhongMaterial({color: 0x408080})
+            new THREE.MeshPhongMaterial({color: 0x255050})
         ]
     );
 
@@ -103,15 +106,18 @@ function ClockNumber() {
 
     scene.add(this.elementsMeshes)
     
-
     this.speed = 3
+    this.currentState = 0
 
-    this.setStatus = function(time) {
+    this.setState = function(stateID, alpha=1) {
         this.elements.forEach((element, id) => {
-            const fract = time - Math.trunc(time)
-            const angle = (elementStatus[Math.trunc(time + 9) % 10][id] * (1 - fract * this.speed) + elementStatus[Math.trunc(time) % 10][id] * fract * this.speed) * pi/2
-            if (fract <= 1/this.speed) element.mesh.setRotationFromEuler(new THREE.Euler(angle, 0, pi/2 * element.isVertical, "ZXY"))
-            else element.mesh.setRotationFromEuler(new THREE.Euler(elementStatus[Math.trunc(time) % 10][id] * pi/2, 0, pi/2 * element.isVertical, "ZXY"))
+            const angle = (elementStatus[this.currentState][id] * (1 - alpha * this.speed) + elementStatus[Math.trunc(stateID) % 10][id] * alpha * this.speed) * pi/2
+            if (alpha <= 1/this.speed) 
+                element.mesh.setRotationFromEuler(new THREE.Euler(angle, 0, pi/2 * element.isVertical, "ZXY"))
+            else {
+                this.currentState = stateID
+                element.mesh.setRotationFromEuler(new THREE.Euler(elementStatus[this.currentState][id] * pi/2, 0, pi/2 * element.isVertical, "ZXY"))
+            }
         })
         
     }
@@ -119,50 +125,50 @@ function ClockNumber() {
 
 function Clock() {
     this.numbers = []
+
     for (let i = 0; i < 6; i++) {
         this.numbers[i] = new ClockNumber()
-        this.numbers[i].setStatus(0)
+        this.numbers[i].setState(0)
     }
 
 
     this.numbers[0].elementsMeshes.translateX(elementSize * 23)
     this.numbers[1].elementsMeshes.translateX(elementSize * 14.5)
-    this.numbers[1].speed *= 10
-
     this.numbers[2].elementsMeshes.translateX(elementSize * 4.25)
-    this.numbers[2].speed *= 60
     this.numbers[3].elementsMeshes.translateX(-elementSize * 4.25)
-    this.numbers[3].speed *= 600
-
     this.numbers[4].elementsMeshes.translateX(-elementSize * 14.5)
-    this.numbers[4].speed *= 3600
     this.numbers[5].elementsMeshes.translateX(-elementSize * 23)
-    this.numbers[5].speed *= 36000
 
 
     this.update = function() {
-        let time = Date.now()
-        time /= 1000
-        this.numbers[0].setStatus(time)
-        time /= 10
-        this.numbers[1].setStatus(time % 6)
-        time /= 6
-        this.numbers[2].setStatus(time)
-        time /= 10
-        this.numbers[3].setStatus(time % 6)
-        /*time /= 6
-        this.numbers[4].setStatus(time % 10)
-        time /= 24
-        this.numbers[5].setStatus(time % 3)*/
+        let time = new Date(Date.now())
+        let alpha = time.getMilliseconds() / 1000
+
+        if (this.numbers[0].currentState != time.getSeconds() % 10)
+            this.numbers[0].setState(time.getSeconds() % 10, alpha)
+
+        if (this.numbers[1].currentState != Math.floor(time.getSeconds()/10))
+            this.numbers[1].setState(Math.floor(time.getSeconds()/10), alpha)
+
+        if (this.numbers[2].currentState != time.getMinutes() % 10) 
+            this.numbers[2].setState(time.getMinutes() % 10, alpha)
+
+        if (this.numbers[3].currentState != Math.floor(time.getMinutes()/10)) 
+            this.numbers[3].setState(Math.floor(time.getMinutes()/10), alpha)
+
+        if (this.numbers[4].currentState != time.getHours() % 10) 
+            this.numbers[4].setState(time.getHours() % 10, alpha)
+
+        if (this.numbers[5].currentState != Math.floor(time.getHours()/10)) 
+            this.numbers[5].setState(Math.floor(time.getHours()/10), alpha)
     }
+
 }
 
 
 const clock = new Clock()
 
 renderer.setAnimationLoop((time) => {
-    //console.log(time/1000)
-    controls.update()
     clock.update()
     renderer.render(scene, camera)
 })
@@ -173,7 +179,11 @@ window.addEventListener('resize', resize);
 
 function resize()
 {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    //camera.aspect = window.innerWidth / window.innerHeight;
+    camera.left = -window.innerWidth * zoom;
+    camera.right = window.innerWidth * zoom;
+    camera.top = window.innerHeight * zoom;
+    camera.bottom = -window.innerHeight * zoom;
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
