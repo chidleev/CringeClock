@@ -5,8 +5,9 @@ import {FlakesTexture} from 'FlakesTexture'
 const elementSize = 10
 const pi = 3.14159265359
 const zoom = 0.2
+let bgColor = (Math.random()/4) * 0xffffff
+let numColor = (Math.random()/4 + 0.75) * 0xffffff
 
-const scene = new THREE.Scene()
 const elementStatus = [
     [0, 0, 0, 0, 0, 0, 1], //0
     [1, 0, 0, 1, 1, 1, 1], //1
@@ -20,12 +21,15 @@ const elementStatus = [
     [0, 0, 0, 0, 1, 0, 0]  //9
 ]
 
+
+const scene = new THREE.Scene()
+
 const renderer = new THREE.WebGLRenderer({
     antialias: true
 })
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor(0x204040)
+renderer.setClearColor(bgColor)
 document.body.appendChild(renderer.domElement)
 
 
@@ -37,7 +41,7 @@ camera.position.set(0, 0, 200)
 controls.enableDamping = true*/
 
 
-const ambient = new THREE.AmbientLight(0x204040, 1)
+const ambient = new THREE.AmbientLight(0.75 * 0xffffff, 1)
 scene.add(ambient)
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 1)
@@ -67,8 +71,8 @@ function Element() {
     this.mesh = new THREE.Mesh(
         this.geometry, 
         [
-            new THREE.MeshPhongMaterial({color: 0xffffff}),
-            new THREE.MeshPhongMaterial({color: 0x255050})
+            new THREE.MeshPhongMaterial({color: numColor}),
+            new THREE.MeshPhongMaterial({color: bgColor})
         ]
     );
 
