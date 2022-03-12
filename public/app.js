@@ -4,7 +4,7 @@ import {FlakesTexture} from 'FlakesTexture'
 
 const elementSize = 10
 const pi = 3.14159265359
-const zoom = 0.2
+let aspect = window.innerWidth/window.innerHeight
 let bgColor = (Math.random()/4) * 0xffffff
 let numColor = (Math.random()/4 + 0.75) * 0xffffff
 
@@ -34,7 +34,7 @@ document.body.appendChild(renderer.domElement)
 
 
 //const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-const camera = new THREE.OrthographicCamera(-window.innerWidth * zoom, window.innerWidth * zoom, window.innerHeight * zoom, -window.innerHeight * zoom, 0.0001, 10000);
+const camera = new THREE.OrthographicCamera(-elementSize * 30, elementSize * 30, elementSize * 30/aspect, -elementSize * 30/aspect, 0.0001, 10000);
 camera.position.set(0, 0, 200)
 
 /*const controls = new OrbitControls(camera, document.body)
@@ -184,12 +184,13 @@ window.addEventListener('resize', resize);
 function resize()
 {
     //camera.aspect = window.innerWidth / window.innerHeight;
-    camera.left = -window.innerWidth * zoom;
-    camera.right = window.innerWidth * zoom;
-    camera.top = window.innerHeight * zoom;
-    camera.bottom = -window.innerHeight * zoom;
-    camera.updateProjectionMatrix();
+    aspect = window.innerWidth/window.innerHeight
+    camera.left = -elementSize * 30
+    camera.right = elementSize * 30
+    camera.top = elementSize * 30/aspect
+    camera.bottom = -elementSize * 30/aspect
+    camera.updateProjectionMatrix()
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
