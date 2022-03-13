@@ -1,12 +1,10 @@
-import * as THREE from 'three'
-import {OrbitControls} from 'OrbitControls'
-import {FlakesTexture} from 'FlakesTexture'
+import * as THREE from './build/three.module.js'
 
 const elementSize = 10
 const pi = 3.14159265359
 let aspect = window.innerWidth/window.innerHeight
-let bgColor = (Math.random()/4) * 0xffffff
-let numColor = (Math.random()/4 + 0.75) * 0xffffff
+let bgColor = 0xE9EAB8
+let numColor = 0xCD1D17
 
 const elementStatus = [
     [0, 0, 0, 0, 0, 0, 1], //0
@@ -33,18 +31,14 @@ renderer.setClearColor(bgColor)
 document.body.appendChild(renderer.domElement)
 
 
-//const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 const camera = new THREE.OrthographicCamera(-elementSize * 30, elementSize * 30, elementSize * 30/aspect, -elementSize * 30/aspect, 0.0001, 10000);
 camera.position.set(0, 0, 200)
 
-/*const controls = new OrbitControls(camera, document.body)
-controls.enableDamping = true*/
 
-
-const ambient = new THREE.AmbientLight(0.75 * 0xffffff, 1)
+const ambient = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambient)
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 1)
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.5)
 dirLight.position.set(0, 0, 100)
 scene.add(dirLight)
 
@@ -183,7 +177,6 @@ window.addEventListener('resize', resize);
 
 function resize()
 {
-    //camera.aspect = window.innerWidth / window.innerHeight;
     aspect = window.innerWidth/window.innerHeight
     camera.left = -elementSize * 30
     camera.right = elementSize * 30
