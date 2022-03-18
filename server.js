@@ -6,7 +6,9 @@ const app = express()
 const server = http.createServer(app)
 
 app.use(express.static(path.join(__dirname, "public")))
-app.use('/build/', express.static(path.join(__dirname, 'node_modules/three/build')));
-app.use('/jsm/', express.static(path.join(__dirname, 'node_modules/three/examples/jsm')));
+app.use('/build/', express.static(path.join(__dirname, 'node_modules/three/build')))
+app.use('/jsm/', express.static(path.join(__dirname, 'node_modules/three/examples/jsm')))
+
+app.use("/html", express.static(path.join(__dirname, "singleHTML")))
 
 server.listen(PORT, () => {console.log(`Server running on port ${PORT}`)})
